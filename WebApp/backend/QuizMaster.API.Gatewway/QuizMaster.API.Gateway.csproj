@@ -4,29 +4,33 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>8a58eac4-bd1e-4761-93f6-7dfba4993b25</UserSecretsId>
+    <UserSecretsId>1fffb094-b162-48e2-8de7-544b986f3d5c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	  <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="Google.Protobuf" Version="3.24.4" />
+    <PackageReference Include="Google.Protobuf" Version="3.25.1" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
     <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
     <PackageReference Include="Grpc.Tools" Version="2.59.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RabbitMQ.Client" Version="6.6.0" />
+	  
+	  <PackageReference Include="RabbitMQ.Client" Version="6.6.0" />
+	  <!-- If mo error ang inyoha dri nga part change lang ang version to 6.2.3 -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\QuizMaster.API.Account\QuizMaster.API.Account.csproj" />
     <ProjectReference Include="..\QuizMaster.API.Authentication\QuizMaster.API.Authentication.csproj" />
+    <ProjectReference Include="..\QuizMaster.API.Media\QuizMaster.API.Media.csproj" />
+    <ProjectReference Include="..\QuizMaster.API.QuizSession\QuizMaster.API.QuizSession.csproj" />
     <ProjectReference Include="..\QuizMaster.API.Quiz\QuizMaster.API.Quiz.csproj" />
     <ProjectReference Include="..\QuizMaster.Library.Common\QuizMaster.Library.Common.csproj" />
   </ItemGroup>
@@ -38,9 +42,31 @@
     <Protobuf Include="..\QuizMaster.API.Authentication\Proto\account.proto" GrpcServices="Client">
       <Link>Protos\account.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\QuizMaster.API.Media\Proto\media.proto" GrpcServices="Client">
+      <Link>Protos\media.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\QuizMaster.API.QuizSession\Protos\quiz_set.proto" GrpcServices="Client">
+      <Link>Protos\quiz_set.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\QuizMaster.API.QuizSession\Protos\room.proto" GrpcServices="Client">
+      <Link>Protos\room.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\QuizMaster.API.Quiz\Protos\quiz.proto" GrpcServices="Client">
+      <Link>Protos\quiz.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\QuizMaster.API.Quiz\Protos\quiz_category.proto" GrpcServices="Client">
       <Link>Protos\quiz_category.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\QuizMaster.API.Quiz\Protos\quiz_difficulty.proto" GrpcServices="Client">
+      <Link>Protos\quiz_difficulty.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\QuizMaster.API.Quiz\Protos\quiz_type.proto" GrpcServices="Client">
+      <Link>Protos\quiz_type.proto</Link>
+    </Protobuf>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

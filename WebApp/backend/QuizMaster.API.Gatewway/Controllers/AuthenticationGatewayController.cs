@@ -12,7 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using QuizMaster.API.Gateway.Helper;
 using Microsoft.Extensions.Options;
-using QuizMaster.API.Authentication.Configuration;
+using QuizMaster.API.Gateway.Configuration;
+using QuizMaster.Library.Common.Models;
 
 namespace QuizMaster.API.Gateway.Controllers
 {
@@ -23,20 +24,14 @@ namespace QuizMaster.API.Gateway.Controllers
         private readonly GrpcChannel _channel;
         private readonly AuthService.AuthServiceClient _channelClient;
 
-        public AuthenticationGatewayController(IOptions<AppSettings> options)
+        public AuthenticationGatewayController(IOptions<GrpcServerConfiguration> options)
         {
-            var handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => {
-                // Implement your custom certificate validation logic here.
-                // Return 'true' if the certificate is trusted, 'false' otherwise.
-                return true; // For simplicity, trust all certificates (not recommended for production).
-            };
-            _channel = GrpcChannel.ForAddress(options.Value.MICROSERVICE_AUTH_HOST);
+            _channel = GrpcChannel.ForAddress(options.Value.Authentication_Service);
             _channelClient = new AuthService.AuthServiceClient(_channel);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] AuthRequest requestModel)
+        public async Task<IActionResult> Login([FromBody] AuthenticationRequestDTO requestModel)
         {
             var request = new AuthenticationRequest()
             {
@@ -80,12 +75,27 @@ namespace QuizMaster.API.Gateway.Controllers
         [HttpGet("info")]
         public async Task<IActionResult> GetCookieInfo()
         {
+            string token = string.Empty;
             // grab the claims identity
             var tokenClaim = User.Claims.ToList().FirstOrDefault(e => e.Type == "token");
 
-            if(tokenClaim == null) { return NotFound(new { Message = "No information found based on session" }); }
-
-            string token = tokenClaim.Value;
+            if(tokenClaim == null) 
+            {
+                // Check the request header if there is a JWT token
+                try
+                {
+                    token = HttpContext.Request.Headers.Authorization.ToString().Split(" ")[1];
+                }
+                catch
+                {
+                    return NotFound(new { Message = "No information found based on session" });
+                }
+            }
+            else
+            {
+                token = tokenClaim.Value;
+            }
+            
 
             var request = new ValidationRequest()
             {
@@ -102,12 +112,19 @@ namespace QuizMaster.API.Gateway.Controllers
             return Ok(new { Message = "Info", info });
         }
 
-        [QuizMasterAuthorization]
+        [QuizMasterAdminAuthorization]
         [HttpPost]
-        [Route("set_admin/{id}")]
-        public IActionResult SetAdmin(int id)
+        [Route("set_admin/{username}")]
+        public async Task<IActionResult> SetAdmin(string username)
         {
-            return Ok();
+            var request = new SetAdminRequest()
+            {
+                Username = username
+            };
+
+            var response = await _channelClient.SetAdminAsync(request);
+            var info = JsonConvert.DeserializeObject<ResponseDto>(response.Response);
+            return Ok(info);
         }
     }
 }
